@@ -1,10 +1,13 @@
 package kb.gui;
 
 import java.awt.BorderLayout;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -30,7 +33,6 @@ public class MainWindow extends JFrame {
 	private static final int POSY	= 20;
 	
 	
-	
 	/*	###############################
 	 * 	Attribute anderer Klassen
 	 * 	###############################
@@ -40,11 +42,9 @@ public class MainWindow extends JFrame {
 	private Module_ListOfBugs 	listOfBugs 	= new Module_ListOfBugs();
 	private Module_Status		status		= new Module_Status();
 	
-	
-	
-	
 	/**
-	 * 	Kunstruktor legt die Größe des Fensters fest.<p>
+	 * 	<b>Kunstruktor</b><p>
+	 * 	Legt die Größe und Position des Fensters fest.<br>
 	 * 	Das Aussehen des Fensters wird an das OS
 	 * 	angepasst.
 	 * 
@@ -102,15 +102,28 @@ public class MainWindow extends JFrame {
 	 * 	<li>Hilfe</li>
 	 */
 	private void buildMenu() {
+		//Variablen für die Unterstützung mehrerer Sprachen
+		String language = new String("de");
+		String country = new String("DE");
+		
+		Locale currentLocale;
+		ResourceBundle messages;
+		
+		currentLocale = new Locale(language, country);
+		messages = ResourceBundle.getBundle("kb.properties.MessagesBundle");
 		
 		//Menüleiste und Items werden beigelegt
 		JMenuBar 	menuBar 			= new JMenuBar();
-		JMenu 		menuDatei 			= new JMenu("Datei");
+		JMenu 		menuDatei 			= new JMenu(messages.getString("file"));
 		JMenu		menuEinstellungen	= new JMenu("Einstellungen");
 		JMenu		menuHilfe			= new JMenu("Hilfe");
 		
+		JMenuItem	itemNewBugWindow	= new JMenuItem("Neuer Bug");
+		
 		//MenuBar wird der GUI hinzugefügt
 		setJMenuBar(menuBar);
+		
+		menuDatei.add(itemNewBugWindow);
 		
 		//Reihenfolge der Items wird festgelegt
 		menuBar.add(menuDatei);
