@@ -1,6 +1,9 @@
 package kb.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -10,6 +13,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import kb.misc.LanguageControl;
 
 public class MainWindow extends JFrame {
 	
@@ -42,11 +47,15 @@ public class MainWindow extends JFrame {
 	private Module_ListOfBugs 	listOfBugs 	= new Module_ListOfBugs();
 	private Module_Status		status		= new Module_Status();
 	
+	private LanguageControl		languageControl = new LanguageControl();
+	
 	/**
 	 * 	<b>Kunstruktor</b><p>
 	 * 	Legt die Größe und Position des Fensters fest.<br>
 	 * 	Das Aussehen des Fensters wird an das OS
 	 * 	angepasst.
+	 * 
+	 * 	Die gespeicherte Sprache wird geladen.
 	 * 
 	 * @throws UnsupportedLookAndFeelException 
 	 * @throws IllegalAccessException 
@@ -74,6 +83,9 @@ public class MainWindow extends JFrame {
 		//Layoutmanager wird festgelegt
 		setLayout(new BorderLayout());
 		
+		//Sprache wird geladen
+		languageControl.loadLanguage();
+		
 		//Module werden zusammengesetzt
 		buildGUI();
 		
@@ -97,12 +109,41 @@ public class MainWindow extends JFrame {
 	 * 	Menü wird erstellt.<p>
 	 * 	
 	 * 	Vorhandene Optionen:
-	 * 	<li>Datei</li>
-	 * 	<li>Einstellungen</li>
-	 * 	<li>Hilfe</li>
+	 * 	<ul>
+	 * 		<li>Datei
+	 * 			<ul>
+	 * 				<li>Neuer Bug</li>
+	 *  		</ul>
+	 *  	</li>
+	 * 	</ul>
+	 * 	<ul>
+	 * 		<li>Einstellungen
+	 * 			<ul>
+	 * 				<li>Sprachen
+	 * 					<ul>
+	 * 						<li>Deutsch</li>
+	 * 						<li>Englisch</li>
+	 * 					</ul>
+	 * 				</li>
+	 * 			</ul>
+	 * 		</li>
+	 * 	</ul>
+	 * 	<ul>
+	 * 		<li>Hilfe</li>
+	 * 	</ul>
+	 * 	</ul>
+	 *  <p><br>
+	 * 
+	 * 	Die Menüleiste und deren Items sind für mehrere Sprachen optimiert.<br>
+	 * 	Eine neue Sprache kann mittels einer "MessagesBundle" Datei hinzugefügt werden.
 	 */
 	private void buildMenu() {
 		//Variablen für die Unterstützung mehrerer Sprachen
+		Locale[] supportedLocales = {
+			Locale.GERMAN,
+		    Locale.ENGLISH
+		};
+		
 		String language = new String("de");
 		String country = new String("DE");
 		
@@ -110,24 +151,75 @@ public class MainWindow extends JFrame {
 		ResourceBundle messages;
 		
 		currentLocale = new Locale(language, country);
-		messages = ResourceBundle.getBundle("kb.properties.MessagesBundle");
+		
+		//Hierbei wird die "MessagesBundle" Datei gesucht und mit dem entsprechenden Suffix,
+		//welche in der "currentLocale" Variable gespeichert ist, geladen.
+		messages = ResourceBundle.getBundle("kb.properties.MessagesBundle", currentLocale);
 		
 		//Menüleiste und Items werden beigelegt
-		JMenuBar 	menuBar 			= new JMenuBar();
-		JMenu 		menuDatei 			= new JMenu(messages.getString("file"));
-		JMenu		menuEinstellungen	= new JMenu("Einstellungen");
-		JMenu		menuHilfe			= new JMenu("Hilfe");
+		//messages.getString(XY) holt sich das Keyword aus der MessagesBundle*.properties Datei
+		JMenuBar 	menuBar 		= new JMenuBar();
+		JMenu 		menuFile 		= new JMenu(messages.getString("file"));
+		JMenu		menuSettings	= new JMenu(messages.getString("settings"));
+		JMenu		menuHelp		= new JMenu(messages.getString("help"));
 		
-		JMenuItem	itemNewBugWindow	= new JMenuItem("Neuer Bug");
+		JMenuItem	itemFileNewBugWindow	= new JMenuItem(messages.getString("newBug"));
+		
+		//Menu als MenuItem
+		JMenu	itemSettingsLanguage	= new JMenu(messages.getString("language"));
+		
+		/*
+		 * Schleife um alle Sprachen anzuzeigen
+		 * Hierbei wird eine ArrayList zur Unterstützung genommen.
+		 * Diese speichert alle verfügbaren Sprachen.
+		 */
+		ArrayList<JMenuItem> languageList = new ArrayList<JMenuItem>();
+		for(Locale locale : supportedLocales)
+			languageList.add(new JMenuItem(locale.getDisplayLanguage(currentLocale)));
+		
+		
 		
 		//MenuBar wird der GUI hinzugefügt
 		setJMenuBar(menuBar);
 		
-		menuDatei.add(itemNewBugWindow);
+		//Menu --- "File"
+		menuFile.add(itemFileNewBugWindow);
+		
+		//Menu --- "Settings"
+		menuSettings.add(itemSettingsLanguage);
+		
+		//Menu --- "Settings" - "Language"
+		
+		/*
+		 *	Alle gespeicherten Sprachen in der ArrayList "languageList"
+		 *	werden zum JMenu "itemSettingsLanguage" hinzugefügt 
+		 */
+		for(JMenuItem jmi : languageList){
+			itemSettingsLanguage.add(jmi);
+			addActionListenerToLanguageMenuItem(jmi);
+		}
+		
 		
 		//Reihenfolge der Items wird festgelegt
-		menuBar.add(menuDatei);
-		menuBar.add(menuEinstellungen);
-		menuBar.add(menuHilfe);
+		menuBar.add(menuFile);
+		menuBar.add(menuSettings);
+		menuBar.add(menuHelp);
+		
+		//ActionListener werden hinzugefügt
+		
+	}
+	
+	/**
+	 * Actionlistener werden zu dem jeweiligen MenuItem hinzugefügt
+	 * 
+	 * @param jMenuItem	- Das angeklickte JMenuItem
+	 */
+	private void addActionListenerToLanguageMenuItem(final JMenuItem jMenuItem){
+		jMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				languageControl.saveLanguage(jMenuItem);
+			}
+		});
 	}
 }
