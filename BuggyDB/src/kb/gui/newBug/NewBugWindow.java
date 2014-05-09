@@ -1,21 +1,19 @@
 package kb.gui.newBug;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import net.miginfocom.swt.MigLayout;
 
 public class NewBugWindow extends JDialog{
-
+	//TODO MIGLAYOUT!
 	/*	###############################
 	 * 	Konstante
 	 * 	###############################
@@ -41,7 +39,7 @@ public class NewBugWindow extends JDialog{
 	 */
 	
 	private JTextField 	titleField 			= new JTextField("Titel");
-	private JTextArea	textAreaDescription	= new JTextArea("");
+	private JEditorPane	textAreaDescription	= new JEditorPane();
 	
 	private JButton	clipBoard			= new JButton("Clipboard");
 	private JButton	externalFile		= new JButton("Datei");
@@ -79,17 +77,23 @@ public class NewBugWindow extends JDialog{
 	 * 	zusammengesetzt.
 	 */
 	private void buildGUI() {
+		
+		//Für fileControl und bugControl werden unterschiedliche Layouts verwendet
 		setAdditionalLayout();
 		
+		//SwingKomponenten werden hinzugefügt:
+		//Titelleiste, TextEditorArea, fileControl, bugControl
 		this.add(titleField, BorderLayout.NORTH);
 		this.add(textAreaDescription, BorderLayout.CENTER);
 		this.add(fileControl, BorderLayout.EAST);
 		this.add(bugControl, BorderLayout.SOUTH);
 		
+		//Es werden drei Buttons zu FileControl hinzugefügt
 		fileControl.add(clipBoard);
 		fileControl.add(externalFile);
 		fileControl.add(externalFileLine);
 		
+		//Der Save und Cancel Button werden zu bugControl hinzugefügt
 		bugControl.add(save);
 		bugControl.add(cancel);
 	}
@@ -99,7 +103,7 @@ public class NewBugWindow extends JDialog{
 	 * 	Für bugControl wird ein FlowLayout verwendet.
 	 */
 	private void setAdditionalLayout() {
-		//fileControl.setLayout();
+		fileControl.setLayout(new BoxLayout(fileControl, BoxLayout.Y_AXIS));
 		bugControl.setLayout(new FlowLayout());
 	}
 }
