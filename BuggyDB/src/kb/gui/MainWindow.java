@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import kb.gui.newBug.NewBugWindow;
 import kb.misc.LanguageControl;
 
 public class MainWindow extends JFrame {
@@ -80,7 +81,7 @@ public class MainWindow extends JFrame {
 		//Position und Größe des Fensters
 		setBounds(POSX, POSY, WIDTH, HEIGTH);
 		
-		//Layoutmanager wird festgelegt
+		//Layoutmanager wird auf das BorderLayout festgelegt
 		setLayout(new BorderLayout());
 		
 		//Sprache wird geladen
@@ -206,11 +207,27 @@ public class MainWindow extends JFrame {
 		menuBar.add(menuHelp);
 		
 		//ActionListener werden hinzugefügt
-		
+		addActionListenerToNewBug(itemFileNewBugWindow);
 	}
 	
 	/**
-	 * Actionlistener werden zu dem jeweiligen MenuItem hinzugefügt
+	 * <b>ActionListener für das MenuItem "New Bug"</b><p>
+	 * Ein JDialog wird geöffnet um die Daten des neuen Bugs zu erfassen.
+	 * 
+	 * @param itemFileNewBugWindow - Das MenuItem "New Bug" wird übergeben
+	 */
+	private void addActionListenerToNewBug(JMenuItem itemFileNewBugWindow) {
+		itemFileNewBugWindow.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				NewBugWindow nbw = new NewBugWindow();
+				nbw.setVisible(true);
+			}
+		});
+	}
+
+	/**
+	 * <b>Actionlistener werden zu dem jeweiligen MenuItem hinzugefügt</b>
 	 * 
 	 * @param jMenuItem	- Das angeklickte JMenuItem
 	 */
