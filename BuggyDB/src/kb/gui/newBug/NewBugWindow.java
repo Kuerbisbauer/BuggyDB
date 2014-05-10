@@ -2,6 +2,10 @@ package kb.gui.newBug;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -10,6 +14,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import kb.clipBoardControl.ExtractClipboard;
 
 
 public class NewBugWindow extends JDialog{
@@ -96,6 +102,49 @@ public class NewBugWindow extends JDialog{
 		//Der Save und Cancel Button werden zu bugControl hinzugefügt
 		bugControl.add(save);
 		bugControl.add(cancel);
+		
+		addActionListenerForButtons();
+	}
+
+	/**
+	 * 	Actionlistener für folgende Buttons wird hinzugefügt:<br>
+	 * 	<li>clipBoard
+	 * 	<li>externalFile
+	 * 	<li>externalFileLine
+	 * 	<li>save
+	 * 	<li>cancel
+	 */
+	private void addActionListenerForButtons() {
+		final ExtractClipboard extractClip = new ExtractClipboard();
+		
+		clipBoard.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					extractClip.getFile();
+					externalFileLine.setText(String.valueOf(extractClip.getLineNumber()));
+					extractClip.resetNumber();
+				} catch (UnsupportedFlavorException e1) {
+					System.err.println("Es werden nur Texte unterstützt.");
+				} catch (IOException e1) {
+					System.err.println("Fehler beim Lesen der Zwischenablage");
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		externalFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					extractClip.getLine();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**

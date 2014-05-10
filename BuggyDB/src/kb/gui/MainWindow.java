@@ -139,6 +139,8 @@ public class MainWindow extends JFrame {
 	 * 	Eine neue Sprache kann mittels einer "MessagesBundle" Datei hinzugefügt werden.
 	 */
 	private void buildMenu() {
+		//TODO Sprachenwechsel implementieren!
+		
 		//Variablen für die Unterstützung mehrerer Sprachen
 		Locale[] supportedLocales = {
 			Locale.GERMAN,
