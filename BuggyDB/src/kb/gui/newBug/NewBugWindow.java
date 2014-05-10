@@ -120,29 +120,20 @@ public class NewBugWindow extends JDialog{
 		clipBoard.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				try {
-					extractClip.getFile();
-					externalFileLine.setText(String.valueOf(extractClip.getLineNumber()));
-					extractClip.resetNumber();
-				} catch (UnsupportedFlavorException e1) {
-					System.err.println("Es werden nur Texte unterstützt.");
+					externalFileLine.setText(String.valueOf(extractClip.getLine()));
 				} catch (IOException e1) {
-					System.err.println("Fehler beim Lesen der Zwischenablage");
+					System.out.println("Fehler beim Lesen der Datei");
 					e1.printStackTrace();
 				}
+				extractClip.resetNumber();
 			}
 		});
 		
 		externalFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					extractClip.getLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					extractClip.getFile();
 			}
 		});
 	}
