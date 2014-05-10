@@ -2,7 +2,6 @@ package kb.gui.newBug;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -12,10 +11,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import kb.clipBoardControl.ExtractClipboard;
+import kb.misc.SpecificFileButton;
 
 
 public class NewBugWindow extends JDialog{
@@ -47,9 +46,9 @@ public class NewBugWindow extends JDialog{
 	private JTextField 	titleField 			= new JTextField("Titel");
 	private JEditorPane	textAreaDescription	= new JEditorPane();
 	
-	private JButton	clipBoard			= new JButton("Clipboard");
-	private JButton	externalFile		= new JButton("Datei");
-	private JButton externalFileLine	= new JButton("Zeile");
+	private JButton				clipBoard			= new JButton("Clipboard");
+	private SpecificFileButton	externalFile		= new SpecificFileButton("Datei");
+	private JButton 			externalFileLine	= new JButton("Zeile");
 	
 	private JButton	save				= new JButton("Speichern");
 	private JButton cancel				= new JButton("Cancel");
@@ -61,8 +60,7 @@ public class NewBugWindow extends JDialog{
 	 * 	<b>Kunstruktor</b><p>
 	 * 	Legt die Größe und Position des Fensters fest.<br>
 	 * 	Der JDialog ist modul und muss somit geschlossen werden, bevor
-	 * 	das Hauptfenster aktiv wird.
-	 *	
+	 * 	das Hauptfenster aktiv wird. 
 	 */
 	public NewBugWindow(){
 		//Position und Größe des Fensters
@@ -82,7 +80,7 @@ public class NewBugWindow extends JDialog{
 	 * 	Die Swing Komponenten werden im Borderlayout
 	 * 	zusammengesetzt.
 	 */
-	private void buildGUI() {
+	private void buildGUI(){
 		
 		//Für fileControl und bugControl werden unterschiedliche Layouts verwendet
 		setAdditionalLayout();
@@ -113,6 +111,7 @@ public class NewBugWindow extends JDialog{
 	 * 	<li>externalFileLine
 	 * 	<li>save
 	 * 	<li>cancel
+	 * @throws IOException 
 	 */
 	private void addActionListenerForButtons() {
 		final ExtractClipboard extractClip = new ExtractClipboard();
@@ -121,7 +120,16 @@ public class NewBugWindow extends JDialog{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					externalFileLine.setText(String.valueOf(extractClip.getLine()));
+					
+					//Zeilen werden gelesen
+					extractClip.lineReader();
+					
+					//Setzt die Zeilennummer bei Übereinstimmung in den Buttontext 
+					externalFileLine.setText(String.valueOf(extractClip.getLineNumber()));
+					
+					//Der Dateiname wird in den Buttontext geschrieben
+					externalFile.setText(extractClip.getFileName());
+					
 				} catch (IOException e1) {
 					System.out.println("Fehler beim Lesen der Datei");
 					e1.printStackTrace();
@@ -133,7 +141,10 @@ public class NewBugWindow extends JDialog{
 		externalFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-					extractClip.getFile();
+				
+				//Der Dateiname wird in den Buttontext geschrieben
+				externalFile.setFile(extractClip.chooseFile());
+				System.out.println(externalFile.getFile().getAbsolutePath());
 			}
 		});
 	}
