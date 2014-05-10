@@ -2,8 +2,10 @@ package kb.gui.newBug;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.BoxLayout;
@@ -113,27 +115,13 @@ public class NewBugWindow extends JDialog{
 	 * 	<li>cancel
 	 * @throws IOException 
 	 */
+	private ExtractClipboard extractClip = new ExtractClipboard();
+	
 	private void addActionListenerForButtons() {
-		final ExtractClipboard extractClip = new ExtractClipboard();
-		
 		clipBoard.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					
-					//Zeilen werden gelesen
-					extractClip.lineReader();
-					
-					//Setzt die Zeilennummer bei Übereinstimmung in den Buttontext 
-					externalFileLine.setText(String.valueOf(extractClip.getLineNumber()));
-					
-					//Der Dateiname wird in den Buttontext geschrieben
-					externalFile.setText(extractClip.getFileName());
-					
-				} catch (IOException e1) {
-					System.out.println("Fehler beim Lesen der Datei");
-					e1.printStackTrace();
-				}
+				refreshButtons(clipBoard, externalFile, externalFileLine);
 				extractClip.resetNumber();
 			}
 		});
@@ -141,12 +129,33 @@ public class NewBugWindow extends JDialog{
 		externalFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-				//Der Dateiname wird in den Buttontext geschrieben
-				externalFile.setFile(extractClip.chooseFile());
-				System.out.println(externalFile.getFile().getAbsolutePath());
+				extractClip.chooseFile();
+				refreshButtons(clipBoard, externalFile, externalFileLine);
+				extractClip.resetNumber();
 			}
 		});
+	}
+	
+	private void refreshButtons(JButton clipBoard, SpecificFileButton externalFile, JButton externalFileLine){
+
+		File f = extractClip.getFile();
+		
+		//Zeilen werden gelesen
+		if(extractClip.getFile() == null){
+			extractClip.chooseFile();
+			try {
+				extractClip.lineReader();
+			} catch (IOException e) {
+				System.out.println("Fehler beim Lesen der Datei");
+				e.printStackTrace();
+			}
+		}
+		
+		//Setzt die Zeilennummer bei Übereinstimmung in den Buttontext 
+		externalFileLine.setText(String.valueOf(extractClip.getLineNumber()));
+		
+		//Der Dateiname wird in den Buttontext geschrieben
+		externalFile.setText(extractClip.getFileName());
 	}
 
 	/**

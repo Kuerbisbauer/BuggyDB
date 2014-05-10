@@ -41,7 +41,7 @@ public class ExtractClipboard {
 	 * @throws UnsupportedFlavorException	-	Datentyp wird nicht unterstützt
 	 * @throws IOException					-	Fehler beim Lesen der Datei
 	 */
-	private String getClipBoardString() throws UnsupportedFlavorException, IOException {
+	public String getClipBoardString() throws UnsupportedFlavorException, IOException {
 		//Die Zwischenablage wird in "result" gespeichert
 		//Es wird nur Text unterstützt
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -73,11 +73,12 @@ public class ExtractClipboard {
 	public void lineReader() throws IOException {
 		//Liest jede Zeile ein und vergleicht diese mit dem Clipboard
 		//Dabei wird jede Zeile gezählt und die entsprechende Zeile aufgeführt
-		BufferedReader in = new BufferedReader(new FileReader(chooseFile()));
+		
+		BufferedReader in = new BufferedReader(new FileReader(file));
 		String lineString = "";
 		
 		//Jede Zeile wird gelesen bis der String im Clipboard der gleiche ist wie die Zeile
-		while(!lineString.equals(clipBoardString)){
+		while(!lineString.equals(clipBoardString) && in.ready()){
 			//Leerzeichen werden entfernt
 			lineString = in.readLine().trim();
 			
@@ -90,6 +91,10 @@ public class ExtractClipboard {
 			addNumber();
 		}
 		in.close();
+		
+		//Falls keine Übereinstimmung gefunden wurde, wird die Anzahl der Zeilen auf 0 gesetzt
+		if(!lineString.equals(clipBoardString))
+			setLineNumber(0);
 	}
 	
 	/**
